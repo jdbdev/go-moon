@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/jdbdev/go-moon/config"
@@ -22,9 +22,10 @@ const portNumber = ":8080"
 func main() {
 
 	// Server
+	logger := log.New(os.Stdout, "http server: ", log.LstdFlags)
 	app.InProduction = false
-	fmt.Printf("starting server on port %s\n", portNumber)
-	fmt.Printf("app in Production: %t\n", app.InProduction)
+	logger.Printf("starting server on port %s\n", portNumber)
+	logger.Printf("app in Production: %t\n", app.InProduction)
 
 	srv := &http.Server{
 		Addr:         portNumber,
@@ -36,7 +37,7 @@ func main() {
 
 	err := srv.ListenAndServe()
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal(err)
 	}
 
 	// DB Updater
