@@ -4,10 +4,12 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 )
 
-// Logger creates a new logger and logs request information
-func Logger(r *http.Request) {
+// RequestLogger logs request information
+func RequestLogger(r *http.Request, start time.Time) {
 	logger := log.New(os.Stdout, "http request: ", log.LstdFlags)
-	logger.Printf("method: %s, path: %s, from: %s,", r.Method, r.URL.Path, r.RemoteAddr)
+	duration := time.Since(start)
+	logger.Printf("method: %s, path: %s, from: %s, duration: %v", r.Method, r.URL.Path, r.RemoteAddr, duration)
 }
