@@ -10,7 +10,7 @@ import (
 )
 
 // Keep main.go limited to starting and closing services.
-// Mux and routes are in cmd/routes.go
+// http.Handler and routes are in cmd/routes.go
 // handlers are in internal/handlers/*
 // renderers are in internal/render/*
 
@@ -39,5 +39,5 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// DB Update Ticker
+	// DB Updater
 }
