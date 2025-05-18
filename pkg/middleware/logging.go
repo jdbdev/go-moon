@@ -1,20 +1,11 @@
-package main
+package middleware
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/jdbdev/go-moon/pkg/loggers"
 )
-
-// WriteToConsole writes text to console for every page request
-func WriteMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println("testing middleware")
-		next.ServeHTTP(w, r)
-	})
-}
 
 // Logging Middleware
 
