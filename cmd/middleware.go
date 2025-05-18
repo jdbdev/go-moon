@@ -30,6 +30,6 @@ func (l *Logger) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 // NewLogger constructs a new Logger middlerware Handler
-func NewLogger(nextHandler http.Handler) *Logger {
-	return &Logger{nextHandler}
+func NewLogger(Handler http.Handler) *Logger {
+	return &Logger{Handler}
 }

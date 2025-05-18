@@ -3,16 +3,17 @@ package main
 import (
 	"log"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/jdbdev/go-moon/config"
+	"github.com/jdbdev/go-moon/pkg/loggers"
 )
 
 // Keep main.go limited to starting and closing services.
 // http.Handler and routes are in cmd/routes.go
-// handlers are in internal/handlers/*
-// renderers are in internal/render/*
+// middleware in cmd/middleware.go
+// handlers in internal/handlers/*
+// renderers in internal/render/*
 
 var app config.AppConfig
 
@@ -22,10 +23,11 @@ const portNumber = ":8080"
 func main() {
 
 	// Server
-	logger := log.New(os.Stdout, "http server: ", log.LstdFlags)
+
 	app.InProduction = false
-	logger.Printf("starting server on port %s\n", portNumber)
-	logger.Printf("app in Production: %t\n", app.InProduction)
+	app.Port = portNumber
+
+	loggers.ServerStartLogger(&app)
 
 	srv := &http.Server{
 		Addr:         portNumber,
@@ -37,7 +39,7 @@ func main() {
 
 	err := srv.ListenAndServe()
 	if err != nil {
-		logger.Fatal(err)
+		log.Fatal(err)
 	}
 
 	// DB Updater
