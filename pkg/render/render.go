@@ -10,7 +10,12 @@ import (
 	"github.com/jdbdev/go-moon/config"
 )
 
-var app config.AppConfig
+var app *config.AppConfig
+
+// AppSettings takes argument a from main.go and assigns it to var app *config.AppConfig
+func AppSettings(a *config.AppConfig) {
+	app = a
+}
 
 // RenderTemplate takes two arguments; a responsewriter and a string
 func RenderTemplate(w http.ResponseWriter, tmpl string) {

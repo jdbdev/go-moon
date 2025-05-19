@@ -30,11 +30,13 @@ func main() {
 	}
 
 	// Settings
-	app.TemplateCache = tc
 	app.UseCache = true
 	app.InProduction = false
 	app.Port = portNumber
+	app.TemplateCache = tc
 
+	// Pass app wide settings to other packages
+	render.AppSettings(&app)
 	loggers.ConfigLogger(&app)
 
 	// Server
