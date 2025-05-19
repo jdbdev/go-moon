@@ -1,6 +1,8 @@
 # go-moon
 go implementation of project moonramp 
 
+An offramp to the moon!
+
 Status: Early Concept
 
 ## Services

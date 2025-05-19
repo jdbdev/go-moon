@@ -7,6 +7,7 @@ import (
 
 	"github.com/jdbdev/go-moon/config"
 	"github.com/jdbdev/go-moon/pkg/loggers"
+	"github.com/jdbdev/go-moon/pkg/render"
 )
 
 // Keep main.go limited to starting and closing services.
@@ -22,8 +23,14 @@ const portNumber = ":8080"
 
 func main() {
 
-	// Server
+	// Template Cache
+	tc, err := render.CreateTemplateCache()
+	if err != nil {
+		log.Fatal(err)
+	}
+	app.TemplateCache = tc
 
+	// Server
 	app.InProduction = false
 	app.Port = portNumber
 
@@ -37,7 +44,7 @@ func main() {
 		WriteTimeout: 1 * time.Second,
 	}
 
-	err := srv.ListenAndServe()
+	err = srv.ListenAndServe()
 	if err != nil {
 		log.Fatal(err)
 	}
