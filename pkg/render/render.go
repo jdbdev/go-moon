@@ -10,10 +10,11 @@ import (
 	"github.com/jdbdev/go-moon/config"
 )
 
+// App config
 var app *config.AppConfig
 
-// AppSettings takes argument a from main.go and assigns it to var app *config.AppConfig
-func AppSettings(a *config.AppConfig) {
+// AppSettings takes argument a from main.go
+func GetConfig(a *config.AppConfig) {
 	app = a
 }
 
@@ -33,7 +34,7 @@ func RenderTemplate(w http.ResponseWriter, tmpl string) {
 	// 2. Check to see if tmpl matches any index in templateCache
 	template, ok := templateCache[tmpl]
 	if !ok {
-		log.Fatal("could not get the template from tempate cache")
+		log.Fatal("could not get the template from template cache")
 	}
 
 	// 3. Render template

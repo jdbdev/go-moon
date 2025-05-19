@@ -6,15 +6,16 @@ import (
 	"time"
 
 	"github.com/jdbdev/go-moon/config"
+	"github.com/jdbdev/go-moon/pkg/handlers"
 	"github.com/jdbdev/go-moon/pkg/loggers"
 	"github.com/jdbdev/go-moon/pkg/render"
 )
 
-// Keep main.go limited to starting and closing services.
+// Keep main.go limited to configuration and starting/closing services.
 // http.Handler and routes are in cmd/routes.go
-// middleware in cmd/middleware.go
-// handlers in internal/handlers/*
-// renderers in internal/render/*
+// middleware in pkg/middleware/*
+// handlers in pkg/handlers/*
+// renderers in pkg/render/*
 
 var app config.AppConfig
 
@@ -35,9 +36,10 @@ func main() {
 	app.Port = portNumber
 	app.TemplateCache = tc
 
-	// Pass app wide settings to other packages
-	render.AppSettings(&app)
-	loggers.ConfigLogger(&app)
+	// Pass app (config settings) to other packages
+	render.GetConfig(&app)
+	handlers.GetConfig(&app)
+	loggers.GetConfig(&app)
 
 	// Server
 	srv := &http.Server{
@@ -48,7 +50,7 @@ func main() {
 		WriteTimeout: 1 * time.Second,
 	}
 
-	loggers.ServerStartLogger(&app)
+	loggers.ServerStartLogger()
 
 	err = srv.ListenAndServe()
 	if err != nil {

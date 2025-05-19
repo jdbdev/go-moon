@@ -3,8 +3,17 @@ package handlers
 import (
 	"net/http"
 
+	"github.com/jdbdev/go-moon/config"
 	"github.com/jdbdev/go-moon/pkg/render"
 )
+
+// App config
+var app *config.AppConfig
+
+// GetConfig takes argument a from main.go
+func GetConfig(a *config.AppConfig) {
+	app = a
+}
 
 // HealthCheck is used to confirm server status from path .../healthz
 type HealthCheck struct{}

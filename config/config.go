@@ -5,7 +5,7 @@ import (
 	"log"
 )
 
-// AppConfig holds application wide non-sensitive configuration values.
+// AppConfig holds application wide non-sensitive configuration settings.
 type AppConfig struct {
 	InProduction  bool
 	UseCache      bool
