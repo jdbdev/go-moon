@@ -28,14 +28,16 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	app.TemplateCache = tc
 
-	// Server
+	// Settings
+	app.TemplateCache = tc
+	app.UseCache = true
 	app.InProduction = false
 	app.Port = portNumber
 
-	loggers.ServerStartLogger(&app)
+	loggers.ConfigLogger(&app)
 
+	// Server
 	srv := &http.Server{
 		Addr:         portNumber,
 		Handler:      routes(&app),
@@ -43,6 +45,8 @@ func main() {
 		ReadTimeout:  1 * time.Second,
 		WriteTimeout: 1 * time.Second,
 	}
+
+	loggers.ServerStartLogger(&app)
 
 	err = srv.ListenAndServe()
 	if err != nil {

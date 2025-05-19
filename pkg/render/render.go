@@ -1,26 +1,38 @@
 package render
 
 import (
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
 	"path/filepath"
+
+	"github.com/jdbdev/go-moon/config"
 )
+
+var app config.AppConfig
 
 // RenderTemplate takes two arguments; a responsewriter and a string
 func RenderTemplate(w http.ResponseWriter, tmpl string) {
-	// 1. Get the template map
-	templateCache, err := CreateTemplateCache()
-	if err != nil {
-		log.Fatal(err)
+
+	// 1. Get or create a template cache
+	var templateCache map[string]*template.Template
+	if app.UseCache {
+		templateCache = app.TemplateCache
+		fmt.Println("UseCache: true")
+	} else {
+		templateCache, _ = CreateTemplateCache()
+		fmt.Println("UseCache: false")
 	}
+
 	// 2. Check to see if tmpl matches any index in templateCache
 	template, ok := templateCache[tmpl]
 	if !ok {
-		log.Fatal(err)
+		log.Fatal("could not get the template from tempate cache")
 	}
+
 	// 3. Render template
-	err = template.Execute(w, template)
+	err := template.Execute(w, template)
 	if err != nil {
 		log.Fatal(err)
 	}
