@@ -4,12 +4,26 @@ import (
 	"net/http"
 )
 
-// Renderer interface defines what we need for rendering
+//==============================================================================
+// Interfaces
+//==============================================================================
+
+// Renderer defines the template rendering contract.
+// Any type that implements RenderTemplate can be used by handlers
+// to render responses. This allows for:
+// - Easy mocking in tests
+// - Different rendering implementations (HTML, JSON, etc.)
+// - Separation of rendering logic from handlers
 type Renderer interface {
 	RenderTemplate(w http.ResponseWriter, tmpl string)
 }
 
-// HealthCheck is used to confirm server status from path .../healthz
+//==============================================================================
+// Health Check Handler
+//==============================================================================
+
+// HealthCheck responds to /healthz requests.
+// Used by monitoring systems to check if service is alive.
 type HealthCheck struct{}
 
 // HealthCheck implements the Handler Interface for HealthCheck
@@ -20,12 +34,21 @@ func (h *HealthCheck) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(message))
 }
 
-// HomeHandler handles requests to path .../home
+//==============================================================================
+// Page Handlers
+//==============================================================================
+
+// HomeHandler serves the home page template.
+// Uses dependency injection for template rendering.
 type HomeHandler struct {
 	renderer Renderer
 }
 
-// NewHomeHandler creates a new HomeHandler with dependencies
+// NewHomeHandler creates a new HomeHandler with the provided renderer.
+// Example usage:
+//
+//	renderer := render.NewTemplateRenderer(app)
+//	handler := NewHomeHandler(renderer)
 func NewHomeHandler(renderer Renderer) *HomeHandler {
 	return &HomeHandler{
 		renderer: renderer,
@@ -37,12 +60,13 @@ func (h *HomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.renderer.RenderTemplate(w, "home.page.tmpl")
 }
 
-// AboutHandler handles requests to .../about
+// AboutHandler serves the about page template.
+// Uses dependency injection for template rendering.
 type AboutHandler struct {
 	renderer Renderer
 }
 
-// NewAboutHandler creates a new AboutHandler with dependencies
+// NewAboutHandler creates a new AboutHandler with the provided renderer.
 func NewAboutHandler(renderer Renderer) *AboutHandler {
 	return &AboutHandler{
 		renderer: renderer,
@@ -54,12 +78,13 @@ func (h *AboutHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.renderer.RenderTemplate(w, "about.page.tmpl")
 }
 
-// UserHandler handles requests to .../users
+// UserHandler serves the user page template.
+// Uses dependency injection for template rendering.
 type UserHandler struct {
 	renderer Renderer
 }
 
-// NewUserHandler creates a new UserHandler with dependencies
+// NewUserHandler creates a new UserHandler with the provided renderer.
 func NewUserHandler(renderer Renderer) *UserHandler {
 	return &UserHandler{
 		renderer: renderer,
