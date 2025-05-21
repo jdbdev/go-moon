@@ -10,21 +10,24 @@ import (
 	"github.com/jdbdev/go-moon/config"
 )
 
-// App config
-var app *config.AppConfig
-
-// AppSettings takes argument a from main.go
-func GetConfig(a *config.AppConfig) {
-	app = a
+// TemplateRenderer handles template rendering with configuration (conforms to Renderer interface)
+type TemplateRenderer struct {
+	app *config.AppConfig
 }
 
-// RenderTemplate takes two arguments; a responsewriter and a string
-func RenderTemplate(w http.ResponseWriter, tmpl string) {
+// NewTemplateRenderer creates a new template renderer with the given config
+func NewTemplateRenderer(a *config.AppConfig) *TemplateRenderer {
+	return &TemplateRenderer{
+		app: a,
+	}
+}
 
+// RenderTemplate renders the specified template
+func (tr *TemplateRenderer) RenderTemplate(w http.ResponseWriter, tmpl string) {
 	// 1. Get or create a template cache
 	var templateCache map[string]*template.Template
-	if app.UseCache {
-		templateCache = app.TemplateCache
+	if tr.app.UseCache {
+		templateCache = tr.app.TemplateCache
 		fmt.Println("UseCache: true")
 	} else {
 		templateCache, _ = CreateTemplateCache()
@@ -44,16 +47,15 @@ func RenderTemplate(w http.ResponseWriter, tmpl string) {
 	}
 }
 
-// CreateTemplateCache parses files in ./templates and creates a cache for future loading.
+// CreateTemplateCache parses files in web/templates and creates a cache for future loading.
 // This avoids having to add templates manually and all templates are added when called.
 // Function parses for all .tmpl files, including associated layouts
 func CreateTemplateCache() (map[string]*template.Template, error) {
-
 	// 1. Create template cache
 	newCache := map[string]*template.Template{}
 
-	// 2. Get all the files that end with *.page.tmpl from ./templates into a []string
-	pages, err := filepath.Glob("./templates/*.page.tmpl")
+	// 2. Get all the files that end with *.page.tmpl from web/templates into a []string
+	pages, err := filepath.Glob("./web/templates/*.page.tmpl")
 	if err != nil {
 		return newCache, err
 	}
@@ -68,13 +70,13 @@ func CreateTemplateCache() (map[string]*template.Template, error) {
 			return newCache, err
 		}
 
-		layout, err := filepath.Glob("./templates/*.layout.tmpl")
+		layout, err := filepath.Glob("./web/templates/*.layout.tmpl")
 		if err != nil {
 			return newCache, err
 		}
 
 		if len(layout) > 0 {
-			templateSet, err = templateSet.ParseGlob("./templates/*.layout.tmpl")
+			templateSet, err = templateSet.ParseGlob("./web/templates/*.layout.tmpl")
 			if err != nil {
 				return newCache, err
 			}
