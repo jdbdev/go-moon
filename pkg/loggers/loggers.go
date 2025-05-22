@@ -5,34 +5,49 @@ import (
 	"net/http"
 	"os"
 	"time"
-
-	"github.com/jdbdev/go-moon/config"
 )
 
-// App config
-var app *config.AppConfig
-
-// GetConfig takes argument a from main.go
-func GetConfig(a *config.AppConfig) {
-	app = a
+// LoggerConfig holds the configuration needed for logging
+type LoggerConfig struct {
+	Port         string
+	InProduction bool
+	UseCache     bool
 }
 
-// StartServer logs server start
-func ServerStartLogger() {
-	logger := log.New(os.Stdout, "http server: ", log.LstdFlags)
-	logger.Printf("starting server on port %s\n", app.Port)
-	logger.Printf("app in Production: %t\n", app.InProduction)
+// Logger handles all application logging needs.
+// It contains any configuration needed for logging
+// and provides methods for different types of logs.
+type Logger struct {
+	LoggerConfig  // Embed the config
+	serverLogger  *log.Logger
+	configLogger  *log.Logger
+	requestLogger *log.Logger
 }
 
-// ConfigLogger logs configuration settings at application start
-func ConfigLogger() {
-	logger := log.New(os.Stdout, "Config: ", log.LstdFlags)
-	logger.Printf("InProduction: %t, UseCache: %t", app.InProduction, app.UseCache)
+// NewLogger creates a new Logger instance with the provided configuration
+func NewLogger(cfg LoggerConfig) *Logger {
+	return &Logger{
+		LoggerConfig:  cfg,
+		serverLogger:  log.New(os.Stdout, "http server: ", log.LstdFlags),
+		configLogger:  log.New(os.Stdout, "config: ", log.LstdFlags),
+		requestLogger: log.New(os.Stdout, "http request: ", log.LstdFlags),
+	}
 }
 
-// RequestLogger logs request information
-func RequestLogger(r *http.Request, start time.Time) {
-	logger := log.New(os.Stdout, "http request: ", log.LstdFlags)
+// LogServerStart logs server startup information
+func (l *Logger) LogServerStart() {
+	l.serverLogger.Printf("starting server on port %s\n", l.Port)
+	l.serverLogger.Printf("app in Production: %t\n", l.InProduction)
+}
+
+// LogConfig logs configuration settings at application start
+func (l *Logger) LogConfig() {
+	l.configLogger.Printf("InProduction: %t, UseCache: %t", l.InProduction, l.UseCache)
+}
+
+// LogRequest logs information about an HTTP request
+func (l *Logger) LogRequest(r *http.Request, start time.Time) {
 	duration := time.Since(start)
-	logger.Printf("method: %s, path: %s, from: %s, duration: %v", r.Method, r.URL.Path, r.RemoteAddr, duration)
+	l.requestLogger.Printf("method: %s, path: %s, from: %s, duration: %v",
+		r.Method, r.URL.Path, r.RemoteAddr, duration)
 }

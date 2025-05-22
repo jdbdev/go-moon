@@ -44,6 +44,16 @@ func main() {
 	app.Port = cfg.Server.Port
 	app.TemplateCache = tc
 
+	// Initialize logger
+	logger := loggers.NewLogger(loggers.LoggerConfig{
+		Port:         cfg.Server.Port,
+		InProduction: cfg.Server.InProduction,
+		UseCache:     cfg.Server.UseCache,
+	})
+
+	// Log initial configuration
+	logger.LogConfig()
+
 	// // Initialize database connection
 	// dbConfig := database.Config{
 	// 	Host:     cfg.Database.Host,
@@ -59,9 +69,6 @@ func main() {
 	// }
 	// defer database.Close()
 
-	// Share configuration with packages
-	loggers.GetConfig(&app)
-
 	//==========================================================================
 	// Server Configuration & Startup
 	//==========================================================================
@@ -69,7 +76,7 @@ func main() {
 	// Initialize HTTP server
 	srv := &http.Server{
 		Addr:         ":" + cfg.Server.Port,
-		Handler:      routes(&app),
+		Handler:      routes(&app, logger), // Pass logger to routes
 		IdleTimeout:  120 * time.Second,
 		ReadTimeout:  1 * time.Second,
 		WriteTimeout: 1 * time.Second,
@@ -77,7 +84,7 @@ func main() {
 
 	// Start server in background
 	go func() {
-		loggers.ServerStartLogger()
+		logger.LogServerStart()
 		// ListenAndServe always returns an error when the server stops
 		// http.ErrServerClosed is the expected error when Shutdown is called
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
@@ -102,7 +109,7 @@ func main() {
 	<-quit
 
 	// If we get here, it means we received a shutdown signal
-	log.Println("Shutting down server...")
+	logger.LogServerStart() // Log shutdown start
 
 	// Shutdown with timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
