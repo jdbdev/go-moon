@@ -5,10 +5,13 @@ import (
 	"log"
 )
 
-// AppConfig holds application wide runtime configuration and shared resources.
-// This differs from pkg/config which handles environment and startup configuration.
+// AppConfig holds application runtime state and resources.
+// Unlike environment config (EnvConfig), this holds:
+// - Shared resources (template cache, loggers)
+// - Runtime state that can change
+// - Resources that need to be shared between packages
 type AppConfig struct {
-	// Runtime settings
+	// Runtime settings (initialized from environment)
 	InProduction bool
 	UseCache     bool
 	Port         string
@@ -16,4 +19,10 @@ type AppConfig struct {
 	// Shared resources
 	TemplateCache map[string]*template.Template
 	InfoLog       *log.Logger
+
+	// Add other runtime resources here:
+	// - Database connections
+	// - Cache instances
+	// - Session managers
+	// - etc.
 }

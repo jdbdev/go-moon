@@ -5,13 +5,14 @@ import (
 	"strconv"
 )
 
-// Config holds all startup configuration settings
-type Config struct {
+// EnvConfig holds all environment-based configuration settings
+// These are loaded once at startup and don't change during runtime
+type EnvConfig struct {
 	Database DatabaseConfig
 	Server   ServerConfig
 }
 
-// DatabaseConfig holds database-specific configuration
+// DatabaseConfig holds database connection settings from environment
 type DatabaseConfig struct {
 	Host     string
 	Port     string
@@ -20,7 +21,7 @@ type DatabaseConfig struct {
 	DBName   string
 }
 
-// ServerConfig holds server-specific configuration
+// ServerConfig holds server startup settings from environment
 type ServerConfig struct {
 	Port         string
 	InProduction bool
@@ -28,14 +29,15 @@ type ServerConfig struct {
 }
 
 // LoadEnv loads configuration from environment variables with defaults
-func LoadEnv() Config {
-	return Config{
+// This is called once at startup to initialize the application
+func LoadEnv() EnvConfig {
+	return EnvConfig{
 		Database: DatabaseConfig{
 			Host:     getEnv("DB_HOST", "localhost"),
 			Port:     getEnv("DB_PORT", "5432"),
-			User:     getEnv("DB_USER", "postgres"),
-			Password: getEnv("DB_PASSWORD", ""),
-			DBName:   getEnv("DB_NAME", "go_moon_db"),
+			User:     getEnv("POSTGRES_USER", "postgres"),
+			Password: getEnv("POSTGRES_PASSWORD", ""),
+			DBName:   getEnv("POSTGRES_DB", "go_moon"),
 		},
 		Server: ServerConfig{
 			Port:         getEnv("SERVER_PORT", "8080"),

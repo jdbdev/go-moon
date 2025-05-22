@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=db  # Override for Docker networking
+    depends_on:
+      - db
+    volumes:
+      - ./web/templates:/app/web/templates
+    networks:
+      - gomoon-network
+
+  db:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env.db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - gomoon-network
+
+volumes:
+  postgres_data:
+
+networks:
+  gomoon-network:
+    driver: bridge 
