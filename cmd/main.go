@@ -19,36 +19,29 @@ import (
 // Application Entry Point
 //==============================================================================
 
-// Initialize app config variable.
-// Pass by reference to other packages: &app
-// From other packages, use pointer to instance: var app *config.AppConfig
-var app config.AppConfig
-
 func main() {
 	//==========================================================================
 	// Configuration & Setup
 	//==========================================================================
 
 	// Load environment configuration
-	cfg := env.LoadEnv()
+	envCfg := env.LoadEnv()
+
+	// Initialize application config
+	app := config.NewAppConfig(envCfg)
 
 	// Initialize template cache
 	tc, err := render.CreateTemplateCache()
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	// Configure application settings
-	app.UseCache = cfg.Server.UseCache
-	app.InProduction = cfg.Server.InProduction
-	app.Port = cfg.Server.Port
-	app.TemplateCache = tc
+	app.Resources.TemplateCache = tc
 
 	// Initialize logger
 	logger := loggers.NewLogger(loggers.LoggerConfig{
-		Port:         cfg.Server.Port,
-		InProduction: cfg.Server.InProduction,
-		UseCache:     cfg.Server.UseCache,
+		Port:         app.Runtime.Port,
+		InProduction: app.Runtime.InProduction,
+		UseCache:     app.Runtime.UseCache,
 	})
 
 	// Log initial configuration
@@ -75,8 +68,8 @@ func main() {
 
 	// Initialize HTTP server
 	srv := &http.Server{
-		Addr:         ":" + cfg.Server.Port,
-		Handler:      routes(&app, logger), // Pass logger to routes
+		Addr:         ":" + app.Runtime.Port,
+		Handler:      routes(app, logger), // Pass app config and logger
 		IdleTimeout:  120 * time.Second,
 		ReadTimeout:  1 * time.Second,
 		WriteTimeout: 1 * time.Second,
