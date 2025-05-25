@@ -23,6 +23,10 @@ func routes(app *config.AppConfig, logger *loggers.Logger) http.Handler {
 	mux.Handle("/about", handlers.NewAboutHandler(renderer))
 	mux.Handle("/users", handlers.NewUserHandler(renderer))
 
+	// Create file server for static files
+	fileServer := http.FileServer(http.Dir("./static/"))
+	mux.Handle("/static/", http.StripPrefix("/static/", fileServer))
+
 	// Wrap mux with logging middleware
 	return middleware.WithLogging(mux, logger)
 }

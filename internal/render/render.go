@@ -1,7 +1,6 @@
 package render
 
 import (
-	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -28,10 +27,8 @@ func (tr *TemplateRenderer) RenderTemplate(w http.ResponseWriter, tmpl string) {
 	var templateCache map[string]*template.Template
 	if tr.app.Runtime.UseCache {
 		templateCache = tr.app.Resources.TemplateCache
-		fmt.Println("UseCache: true")
 	} else {
 		templateCache, _ = CreateTemplateCache()
-		fmt.Println("UseCache: false")
 	}
 
 	// 2. Check to see if tmpl matches any index in templateCache

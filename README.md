@@ -3,7 +3,9 @@ go implementation of project moonramp
 
 An offramp to the moon!
 
-Status: Early Concept
+Status: Early Concept (2025)
+
+Built in go version 1.23.5
 
 ## Services
 go-moon runs two services:

@@ -23,7 +23,7 @@ type Renderer interface {
 //==============================================================================
 
 // HomeHandler serves the home page template.
-// Uses dependency injection for template rendering.
+// renderer has RenderTemplate() func and conforms to Renderer interface
 type HomeHandler struct {
 	renderer Renderer
 }
