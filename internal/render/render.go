@@ -1,8 +1,8 @@
 package render
 
 import (
+	"fmt"
 	"html/template"
-	"log"
 	"net/http"
 	"path/filepath"
 
@@ -22,26 +22,36 @@ func NewTemplateRenderer(a *config.AppConfig) *TemplateRenderer {
 }
 
 // RenderTemplate renders the specified template
-func (tr *TemplateRenderer) RenderTemplate(w http.ResponseWriter, tmpl string) {
+func (tr *TemplateRenderer) RenderTemplate(w http.ResponseWriter, tmpl string) error {
 	// 1. Get or create a template cache
 	var templateCache map[string]*template.Template
+	var err error
+
 	if tr.app.Runtime.UseCache {
 		templateCache = tr.app.Resources.TemplateCache
 	} else {
-		templateCache, _ = CreateTemplateCache()
+		templateCache, err = CreateTemplateCache()
+		if err != nil {
+			http.Error(w, "Error creating template cache", http.StatusInternalServerError)
+			return err
+		}
 	}
 
 	// 2. Check to see if tmpl matches any index in templateCache
 	template, ok := templateCache[tmpl]
 	if !ok {
-		log.Fatal("could not get the template from template cache")
+		http.Error(w, "Template not found", http.StatusInternalServerError)
+		return fmt.Errorf("template %s not found in cache", tmpl)
 	}
 
 	// 3. Render template
-	err := template.Execute(w, template)
+	err = template.Execute(w, nil) // Changed from template to nil since we're not passing data
 	if err != nil {
-		log.Fatal(err)
+		http.Error(w, "Error rendering template", http.StatusInternalServerError)
+		return err
 	}
+
+	return nil
 }
 
 // CreateTemplateCache parses files in web/templates and creates a cache for future loading.

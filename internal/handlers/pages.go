@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
 )
 
@@ -15,7 +16,7 @@ import (
 // - Different rendering implementations (HTML, JSON, etc.)
 // - Separation of rendering logic from handlers
 type Renderer interface {
-	RenderTemplate(w http.ResponseWriter, tmpl string)
+	RenderTemplate(w http.ResponseWriter, tmpl string) error
 }
 
 //==============================================================================
@@ -41,7 +42,9 @@ func NewHomeHandler(renderer Renderer) *HomeHandler {
 
 // ServeHTTP implements the Handler Interface for HomeHandler
 func (h *HomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	h.renderer.RenderTemplate(w, "home.page.tmpl")
+	if err := h.renderer.RenderTemplate(w, "home.page.tmpl"); err != nil {
+		log.Printf("Error rendering home template: %v", err)
+	}
 }
 
 // AboutHandler serves the about page template.
@@ -59,7 +62,10 @@ func NewAboutHandler(renderer Renderer) *AboutHandler {
 
 // ServeHTTP implements the Handler Interface for AboutHandler
 func (h *AboutHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	h.renderer.RenderTemplate(w, "about.page.tmpl")
+	if err := h.renderer.RenderTemplate(w, "about.page.tmpl"); err != nil {
+		// Error response already sent by renderer
+		log.Printf("Error rendering about template: %v", err)
+	}
 }
 
 // UserHandler serves the user page template.
@@ -77,5 +83,8 @@ func NewUserHandler(renderer Renderer) *UserHandler {
 
 // ServeHTTP implements the Handler Interface for UserHandler
 func (h *UserHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	h.renderer.RenderTemplate(w, "user.page.tmpl")
+	if err := h.renderer.RenderTemplate(w, "user.page.tmpl"); err != nil {
+		// Error response already sent by renderer
+		log.Printf("Error rendering user template: %v", err)
+	}
 }
