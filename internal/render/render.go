@@ -21,8 +21,8 @@ func NewTemplateRenderer(a *config.AppConfig) *TemplateRenderer {
 	}
 }
 
-// RenderTemplate renders the specified template
-func (tr *TemplateRenderer) RenderTemplate(w http.ResponseWriter, tmpl string) error {
+// RenderTemplate renders the specified template with optional data
+func (tr *TemplateRenderer) RenderTemplate(w http.ResponseWriter, tmpl string, data interface{}) error {
 	// 1. Get or create a template cache
 	var templateCache map[string]*template.Template
 	var err error
@@ -44,8 +44,8 @@ func (tr *TemplateRenderer) RenderTemplate(w http.ResponseWriter, tmpl string) e
 		return fmt.Errorf("template %s not found in cache", tmpl)
 	}
 
-	// 3. Render template
-	err = template.Execute(w, nil) // Changed from template to nil since we're not passing data
+	// 3. Render template with data
+	err = template.Execute(w, data)
 	if err != nil {
 		http.Error(w, "Error rendering template", http.StatusInternalServerError)
 		return err
